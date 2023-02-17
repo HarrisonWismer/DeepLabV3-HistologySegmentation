@@ -168,8 +168,8 @@ def get_opts():
     parser.add_argument('--batchSize', '-b', type=int, default=8, help = "Batch Size. Default = 8")
     parser.add_argument('--learningRate', '-l', type=float, default=.0001, help = "Learning Rate. Default = .0001")
     parser.add_argument('--numEpochs', '-e', type=int, default = 5, help = "Numer of Epochs. Default = 5")
-    parser.add_argument('trainingPath', type=str, help = "Folder containing Training Images & Masks.")
-    parser.add_argument('savePath',type=str, default = str(Path.cwd()), help = "Path To Save Trained Model To.")
+    parser.add_argument('trainingPath', type=str, help = "Folder containing Training Images & Masks. This folder should contain one folder called imgs and one folder called masks.")
+    parser.add_argument('savePath',type=str, default = str(Path.cwd()), help = "Path To Save Trained Model To. Should be of the form: '$DesiredPath/ModelName")
 
     return parser.parse_args()
 
@@ -182,9 +182,6 @@ def main():
         print("Invalid Traning Path")
         exit(1)
     
-    if not os.path.exists(opts.savePath):
-        print("Creating Directory:", opts.savePath, "for saving")
-        os.makedirs(opts.savePath)
 
     print("Creating Model")
     myDLV3 = DLV3Model(image_size = opts.imageSize, 
