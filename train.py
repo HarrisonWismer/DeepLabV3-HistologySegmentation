@@ -257,10 +257,12 @@ def main():
 
     print(opts.trainingPath)
 
+    # Verify if the path to the training data is valid. This does not check that the two necessary prerequisit folders are present.
     if not os.path.exists(opts.trainingPath) or not os.path.isdir(opts.trainingPath) or opts.trainingPath is None:
         print("Invalid Traning Path")
         exit(1)
     
+    # Create the DLV3Model object to instantiate the untrained model.\
     print("Creating Model")
     myDLV3 = DLV3Model(image_size = opts.imageSize, 
                    num_classes= opts.numClasses, 
@@ -268,6 +270,8 @@ def main():
                    batch_size = opts.batchSize, 
                    learning_rate = opts.learningRate,
                    num_epochs = opts.numEpochs)
+
+    # Train the model with the specified training data and save the model afterward.
     print("Loading Training Data")
     myDLV3.train_model(opts.trainingPath)
     myDLV3.save_model(opts.savePath)
