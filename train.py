@@ -162,36 +162,40 @@ class DataLoader():
 
 def get_opts():
     parser = argparse.ArgumentParser(description = "Train A DeepLabV3+ Model Using Images & Masks")
-    parser.add_argument('--image-size', '-i', type=int, default = 256, help = "n x n Image Size To Downscale Images To")
-    parser.add_argument('--num-classes', '-n', type=int, default = 2, help = "Number of Classes")
-    parser.add_argument('--val-split', '-v', type=float, default = .2, help = "Proportion of Training Data To Be Used For Validation")
-    parser.add_argument('--batch-size', '-b', type=int, default=8, help = "Batch Size")
-    parser.add_argument('--learning-rate', '-l', type=float, default=.0001, help = "Learning Rate")
-    parser.add_argument('--num-epochs', '-e', type=int, default = 5, help = "Numer of Epochs")
-    parser.add_argument('--training-path', '-t', type=str, help = "Folder containing Training Images & Masks")
-    parser.add_argument('--save-path','-s', type=str, default = str(Path.cwd()), help = "Path To Save Trained Model To")
+    parser.add_argument('--imageSize', '-i', type=int, default = 256, help = "n x n Image Size To Downscale Images To. Default = 256")
+    parser.add_argument('--numClasses', '-n', type=int, default = 2, help = "Number of Classes. Default = 2")
+    parser.add_argument('--valSplit', '-v', type=float, default = .2, help = "Proportion of Training Data To Be Used For Validation. Default = .2")
+    parser.add_argument('--batchSize', '-b', type=int, default=8, help = "Batch Size. Default = 8")
+    parser.add_argument('--learningRate', '-l', type=float, default=.0001, help = "Learning Rate. Default = .0001")
+    parser.add_argument('--numEpochs', '-e', type=int, default = 5, help = "Numer of Epochs. Default = 5")
+    parser.add_argument('trainingPath', type=str, help = "Folder containing Training Images & Masks.")
+    parser.add_argument('savePath',type=str, default = str(Path.cwd()), help = "Path To Save Trained Model To.")
 
     return parser.parse_args()
 
 def main():
     opts = get_opts()
 
-    if not os.path.exists(opts.training_path) or not os.path.isdir(opts.training_path):
+    print(opts.trainingPath)
+
+    if not os.path.exists(opts.trainingPath) or not os.path.isdir(opts.trainingPath) or opts.trainingPath is None:
         print("Invalid Traning Path")
         exit(1)
     
-    if not os.path.exists(opts.save_path):
-        print("Creating Directory:", opts.save_path, "for saving")
-        os.makedirs(opts.save_path)
+    if not os.path.exists(opts.savePath):
+        print("Creating Directory:", opts.savePath, "for saving")
+        os.makedirs(opts.savePath)
 
-    myDLV3 = DLV3Model(image_size = opts.image_size, 
-                   num_classes= opts.num_classes, 
-                   val_split = opts.val_split, 
-                   batch_size = opts.batch_size, 
-                   learning_rate = opts.learning_rate,
-                   num_epochs = opts.num_epochs)
-
-    myDLV3.train_model()
+    print("Creating Model")
+    myDLV3 = DLV3Model(image_size = opts.imageSize, 
+                   num_classes= opts.numClasses, 
+                   val_split = opts.valSplit, 
+                   batch_size = opts.batchSize, 
+                   learning_rate = opts.learningRate,
+                   num_epochs = opts.numEpochs)
+    print("Loading Training Data")
+    myDLV3.train_model(opts.trainingPath)
+    myDLV3.save_model(opts.savePath)
 
 if __name__=="__main__":
     main()
