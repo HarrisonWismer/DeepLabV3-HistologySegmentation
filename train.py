@@ -136,6 +136,7 @@ class DLV3Model():
         training_accuracy = history.history['accuracy'][-1]
         validation_loss = history.history['val_loss'][-1]
         validation_accuracy = history.history['val_accuracy'][-1]
+        print()
         print("Training Loss:", training_loss)
         print("Training Accuracy:", training_accuracy)
         print("Validation Loss:", validation_loss)
