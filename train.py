@@ -230,8 +230,10 @@ class DataLoader():
         
         train_dataset = self.data_generator(X_train, y_train)
         val_dataset = self.data_generator(X_test, y_test)
+        print()
         print("Train Dataset:", train_dataset)
         print("Val Dataset:", val_dataset)
+        print()
         
         return train_dataset,val_dataset
 
@@ -274,8 +276,17 @@ def main():
 
     # Train the model with the specified training data and save the model afterward.
     print("Loading Training Data")
-    myDLV3.train_model(opts.trainingPath)
-    myDLV3.save_model(opts.savePath)
+    try:
+        myDLV3.train_model(opts.trainingPath)
+    except Exception as e:
+        print("Unable to Train Model: ", e)
+    
+    try:
+        myDLV3.save_model(opts.savePath)
+    except:
+        print("Unable to save model to specified path.")
+        print("Saving to current working directory: ", os.getcwd(), "DLV3_Model")
+        myDLV3.save_model(os.getcwd + "DLV3_Model")
 
 if __name__=="__main__":
     main()
