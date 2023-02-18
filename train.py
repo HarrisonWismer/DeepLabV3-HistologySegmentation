@@ -141,6 +141,7 @@ class DLV3Model():
         print("Training Accuracy:", training_accuracy)
         print("Validation Loss:", validation_loss)
         print("Validation Accuracy", validation_accuracy)
+        print()
     
     def get_model(self):
         """
