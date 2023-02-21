@@ -1,0 +1,16 @@
+name: tensorEnv
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9
+  - napari=0.4.17
+  - matplotlib=3.5.3
+  - pathlib=1.0.1
+  - scikit-learn=1.2.1
+  - opencv=4.7.0
+  - numpy
+  - pip
+
+  - pip:
+    - slideio==2.02
