@@ -13,6 +13,11 @@ def get_opts():
     return parser.parse_args()
 
 def main():
+    """
+    This script relies on the ouput from the predict_whole_image.py script. All this script does is use the image
+    and mask generated in predict_whole_image.py and overlays them in napari. This allows interactive viewing.
+    
+    """
     opts = get_opts()
 
     view = napari.Viewer(show=False)
