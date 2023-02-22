@@ -1,17 +1,14 @@
 import os
 import cv2
 import numpy as np
-from glob import glob
-from scipy.io import loadmat
 import matplotlib.pyplot as plt
 from pathlib import Path
-from sklearn.model_selection import train_test_split
 import slideio
 import argparse
+import napari
 
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
@@ -34,7 +31,7 @@ def predict_tile(image_tensor, model):
     prediction_mask = infer(image_tensor=image_tensor, model=model)
     return prediction_mask
 
-def predict_and_stitch(scene, tile_size, colormap, model):
+def predict_and_stitch(scene, tile_size, model):
     
     # Size of Original Image
     x,y = scene.rect[2:]
@@ -50,7 +47,8 @@ def predict_and_stitch(scene, tile_size, colormap, model):
     downY = int((y - origYStart) // downscale)
 
     print("Allocating Image Space")
-    wholeImage = np.zeros(shape=(downY, downX , 3),dtype='uint8')
+    whole_image = np.zeros(shape=(downY, downX , 3),dtype='uint8')
+    prediction_mask = np.zeros(shape=(downY,downX))
     
     print("Tiling and Predicting")
     # Absolute coordinates
@@ -61,17 +59,28 @@ def predict_and_stitch(scene, tile_size, colormap, model):
             downRectY = int(rectY / downscale)
 
             image = scene.read_block((rectX,rectY,tile_size,tile_size))
-            image = read_tile(image,input_size)
-            prediction_overlay = predict_tile(image,colormap,model)
+            scaled_image = cv2.resize(image,dsize=(input_size,input_size))
+            image_tile = read_tile(image,input_size)
+            prediction_overlay = predict_tile(image_tile, model)
             
-            wholeImage[downRectY:downRectY+input_size, downRectX:downRectX+input_size, :] = prediction_overlay
+            try:
+                whole_image[downRectY:downRectY+input_size, downRectX:downRectX+input_size, :] = scaled_image
+                prediction_mask[downRectY:downRectY+input_size, downRectX:downRectX+input_size] = prediction_overlay
+            except:
+                continue
+
+
+    print("Opening Image Viewer")
+    view = napari.Viewer(show=False)
+    view.add_image(whole_image,name="Original Image")
+    view.add_image(prediction_mask,name="Predictions")
+    view.show(block=True)
     
-    
-    print("Writing Image to", str(image_path) + "_predictions.png")
-    savePath = Path("Predictions")
-    savePath.mkdir(parents=True, exist_ok=True)
-    fname = image_path.name.split(".svs")[0]
-    cv2.imwrite(str(savePath / Path(fname + "_predictions.png")), cv2.cvtColor(wholeImage, cv2.COLOR_RGB2BGR))
+    #print("Writing Image to", str(image_path) + "_predictions.png")
+    #savePath = Path("Predictions")
+    #savePath.mkdir(parents=True, exist_ok=True)
+    #fname = image_path.name.split(".svs")[0]
+    #cv2.imwrite(str(savePath / Path(fname + "_predictions.png")), cv2.cvtColor(wholeImage, cv2.COLOR_RGB2BGR))
 
 
 def get_opts():
@@ -84,13 +93,11 @@ def get_opts():
     parser.add_argument('imagePath', type=str, help = "Path to folder containing image to tile and predict")
     parser.add_argument('tileSize', type=int, help = "Size of each tile to use as image to predict. Should be the same size as training tiles.")
     parser.add_argument('numClasses', type=int, help = "The number of classes to predict (should be the same as when training)")
-    parser.add_argument('--outputPath', "-o", type=str, default = str(Path.cwd()), help = "Path to output prediction image")
+    parser.add_argument('--outputPath', "-o", type=str, default = str(Path.cwd() / Path("/Predictions")), help = "Path to output prediction image")
     return parser.parse_args()
 
 def main():
     opts = get_opts()
-
-    print(opts.trainingPath)
 
     try:
         model = tf.keras.models.load_model(opts.modelPath)
@@ -104,10 +111,10 @@ def main():
         scene = image.get_scene(0)
     except Exception as e:
         print("Unable to Load Image For Prediction", e)
+        exit(1)
 
-
-
-    
+    #colormap = np.asarray([[0,0,0],[255,0,0],[0,255,0],[0,0,255]])
+    predict_and_stitch(scene,opts.tileSize,model)
 
 if __name__=="__main__":
     main()
