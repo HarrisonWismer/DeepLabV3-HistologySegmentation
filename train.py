@@ -246,13 +246,13 @@ def get_opts():
     are the path to the training data and the path to save the model to.
     """
     parser = argparse.ArgumentParser(description = "Train A DeepLabV3+ Model Using Images & Masks")
-    parser.add_argument('--imageSize', '-i', type=int, default = 256, help = "n x n Image Size To Downscale Images To. Default = 256")
-    parser.add_argument('--numClasses', '-n', type=int, default = 2, help = "Number of Classes. Default = 2")
-    parser.add_argument('--valSplit', '-v', type=float, default = .2, help = "Proportion of Training Data To Be Used For Validation. Default = .2")
-    parser.add_argument('--batchSize', '-b', type=int, default=8, help = "Batch Size. Default = 8")
-    parser.add_argument('--learningRate', '-l', type=float, default=.0001, help = "Learning Rate. Default = .0001")
-    parser.add_argument('--numEpochs', '-e', type=int, default = 5, help = "Numer of Epochs. Default = 5")
-    parser.add_argument('--savePath',type=str, help = "The name of the model to be saved")
+    parser.add_argument('--image-size', '-i', type=int, default = 256, help = "n x n Image Size To Downscale Images To. Default = 256")
+    parser.add_argument('--num-classes', '-n', type=int, default = 2, help = "Number of Classes. Default = 2")
+    parser.add_argument('--val-split', '-v', type=float, default = .2, help = "Proportion of Training Data To Be Used For Validation. Default = .2")
+    parser.add_argument('--batch-size', '-b', type=int, default=8, help = "Batch Size. Default = 8")
+    parser.add_argument('--learning-rate', '-l', type=float, default=.0001, help = "Learning Rate. Default = .0001")
+    parser.add_argument('--num-epochs', '-e', type=int, default = 5, help = "Numer of Epochs. Default = 5")
+    parser.add_argument('--save-path',type=str, help = "The name of the model to be saved")
 
     return parser.parse_args()
 
@@ -263,12 +263,12 @@ def main():
 
     # Create the DLV3Model object to instantiate the untrained model.\
     print("Creating Model")
-    myDLV3 = DLV3Model(image_size = opts.imageSize, 
-                   num_classes= opts.numClasses, 
-                   val_split = opts.valSplit, 
-                   batch_size = opts.batchSize, 
-                   learning_rate = opts.learningRate,
-                   num_epochs = opts.numEpochs)
+    myDLV3 = DLV3Model(image_size = opts.image_size, 
+                   num_classes= opts.num_classes, 
+                   val_split = opts.val_split, 
+                   batch_size = opts.batch_size, 
+                   learning_rate = opts.learning_rate,
+                   num_epochs = opts.num_epochs)
 
     # Train the model with the specified training data and save the model afterward.
     print("Loading Training Data")
@@ -276,12 +276,12 @@ def main():
         trainingPath = str(Path.cwd() / Path("training_data"))
         myDLV3.train_model(trainingPath)
     except Exception as e:
-        print("Unable to Train Model: ", e)
+        print("Unable to train model with given training path: ", e)
     
-    if opts.savePath is not None:
-        myDLV3.save_model(str(Path.cwd() / Path("models") / Path(opts.savePath)))
+    if opts.save_path is not None:
+        myDLV3.save_model(str(Path.cwd() / Path("models") / Path(opts.save_path)))
     else:
-        modelName = "ImageSize" + str(opts.imageSize) + "_BatchSize" + str(opts.batchSize) + "_LearningRate" + str(opts.learningRate)
+        modelName = "ImageSize" + str(opts.image_size) + "_BatchSize" + str(opts.batch_size) + "_LearningRate" + str(opts.learning_rate)
         myDLV3.save_model(str(Path.cwd() / Path("models") / Path(modelName)))
 
 if __name__=="__main__":
