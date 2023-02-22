@@ -45,7 +45,7 @@ def predict_and_stitch(scene, tile_size, model):
 
     print("Allocating Image Space")
     whole_image = np.zeros(shape=(downY, downX , 3),dtype='uint8')
-    prediction_mask = np.zeros(shape=(downY,downX))
+    prediction_mask = np.zeros(shape=(downY,downX),dtype='uint8')
     
     print("Tiling and Predicting")
     # Absolute coordinates
