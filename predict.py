@@ -17,36 +17,52 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
+def infer(model, image_tensor):
+    predictions = model.predict(np.expand_dims((image_tensor), axis=0),verbose=0)
+    predictions = np.squeeze(predictions)
+    predictions = np.argmax(predictions, axis=2)
+    return predictions
+
+def read_tile(image,input_size):
+    image = tf.convert_to_tensor(image)
+    image.set_shape([None, None, 3])
+    image = tf.image.resize(images=image, size=[input_size, input_size])
+    image = tf.keras.applications.resnet50.preprocess_input(image)
+    return image
+
+def predict_tile(image_tensor, model):
+    prediction_mask = infer(image_tensor=image_tensor, model=model)
+    return prediction_mask
+
 def predict_and_stitch(scene, tile_size, colormap, model):
     
-    # Get the Model's input size and the x,y size of the entire image
-    input_size = model.layers[0].input_shape[0][1]
+    # Size of Original Image
     x,y = scene.rect[2:]
     
     # Calculate downscaling factor for prediction image.
+    input_size = model.layers[0].input_shape[0][1]
     downscale = tile_size / input_size
-    downX =  int(x // downscale)
-    downY = int(y // downscale)
     
-    print("Allocating Image Space")
-    wholeImage = np.zeros(shape=(downY, downX , 3),dtype='uint8')
-    
+    # Crop image to fit the exact tile size without extending past the image.
     origXStart = x % tile_size
     origYStart = y % tile_size
+    downX = int((x - origXStart) // downscale)
+    downY = int((y - origYStart) // downscale)
+
+    print("Allocating Image Space")
+    wholeImage = np.zeros(shape=(downY, downX , 3),dtype='uint8')
     
     print("Tiling and Predicting")
     # Absolute coordinates
     for rectY in range(origYStart, y, tile_size):
-            
         for rectX in range(origXStart, x, tile_size):
 
             downRectX = int(rectX / downscale)
             downRectY = int(rectY / downscale)
 
             image = scene.read_block((rectX,rectY,tile_size,tile_size))
-            image = read_tile(image)
+            image = read_tile(image,input_size)
             prediction_overlay = predict_tile(image,colormap,model)
-
             
             wholeImage[downRectY:downRectY+input_size, downRectX:downRectX+input_size, :] = prediction_overlay
     
@@ -67,6 +83,7 @@ def get_opts():
     parser.add_argument('modelPath', type=str, help = "Path to the trained model from train.py")
     parser.add_argument('imagePath', type=str, help = "Path to folder containing image to tile and predict")
     parser.add_argument('tileSize', type=int, help = "Size of each tile to use as image to predict. Should be the same size as training tiles.")
+    parser.add_argument('numClasses', type=int, help = "The number of classes to predict (should be the same as when training)")
     parser.add_argument('--outputPath', "-o", type=str, default = str(Path.cwd()), help = "Path to output prediction image")
     return parser.parse_args()
 
@@ -82,7 +99,7 @@ def main():
         exit(1)
     
     try:
-        image_type = opts.imagePath.split(".")[-1]
+        image_type = opts.imagePath.split(".")[-1].upper()
         image = slideio.open_slide(opts.imagePath,image_type)
         scene = image.get_scene(0)
     except Exception as e:
