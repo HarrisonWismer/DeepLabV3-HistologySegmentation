@@ -30,13 +30,13 @@ To run this script, after cloning this repository make sure to copy all of your 
 masks into the training_data/masks folder. If these folders are empty, the model will not train.
 
 The optional parameters for train.py are:
-    * image_size -i -> The input size for each image for the model. For an integer n specified, each image will be scaled to (n x n).
-    * num_classes -n -> An integer specifying the number of classes the model will be trained to predict.
-    * val_split -v -> A float f (0.0 <= f <= 1.0) specifying the proportion of the training data to be used for validation.
-    * batch_size -b -> The batch size to be used during training.
-    * learning_rate -l -> The learning rate to be used during training.
-    * numEpochs -e -> The number of epochs to train for.
-    * save_path -> The name to be used when saving the model. The model is saved into the "models" folder of the cloned repository.
+* image_size -i -> The input size for each image for the model. For an integer n specified, each image will be scaled to (n x n).
+* num_classes -n -> An integer specifying the number of classes the model will be trained to predict.
+* val_split -v -> A float f (0.0 <= f <= 1.0) specifying the proportion of the training data to be used for validation.
+* batch_size -b -> The batch size to be used during training.
+* learning_rate -l -> The learning rate to be used during training.
+* numEpochs -e -> The number of epochs to train for.
+* save_path -> The name to be used when saving the model. The model is saved into the "models" folder of the cloned repository.
 
 After running the script, a saved model will be found in the "models" folder of the cloned repository to then be used in prediction tasks.
 Additionally, the final training and validation losses and accuracies will be printed to STDOUT.
