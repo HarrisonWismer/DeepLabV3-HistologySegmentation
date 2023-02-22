@@ -1,14 +1,11 @@
-import os
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
 import slideio
 import argparse
 import napari
 
 import tensorflow as tf
-from tensorflow import keras
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
@@ -73,14 +70,14 @@ def predict_and_stitch(scene, tile_size, model):
     print("Opening Image Viewer")
     view = napari.Viewer(show=False)
     view.add_image(whole_image,name="Original Image")
-    view.add_image(prediction_mask,name="Predictions")
+    view.add_labels(prediction_mask,name="Predictions")
     view.show(block=True)
     
-    #print("Writing Image to", str(image_path) + "_predictions.png")
-    #savePath = Path("Predictions")
-    #savePath.mkdir(parents=True, exist_ok=True)
-    #fname = image_path.name.split(".svs")[0]
-    #cv2.imwrite(str(savePath / Path(fname + "_predictions.png")), cv2.cvtColor(wholeImage, cv2.COLOR_RGB2BGR))
+    print("Writing Image")
+    savePath = Path("Predictions")
+    savePath.mkdir(parents=True, exist_ok=True)
+    cv2.imwrite(str(savePath / Path("model_image.png")), cv2.cvtColor(whole_image, cv2.COLOR_RGB2BGR))
+    cv2.imwrite(str(savePath / Path("model_predictions.png")), cv2.cvtColor(prediction_overlay, cv2.COLOR_RGB2BGR))
 
 
 def get_opts():
@@ -113,7 +110,6 @@ def main():
         print("Unable to Load Image For Prediction", e)
         exit(1)
 
-    #colormap = np.asarray([[0,0,0],[255,0,0],[0,255,0],[0,0,255]])
     predict_and_stitch(scene,opts.tileSize,model)
 
 if __name__=="__main__":
