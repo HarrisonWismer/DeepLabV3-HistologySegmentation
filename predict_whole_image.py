@@ -66,18 +66,21 @@ def predict_and_stitch(scene, tile_size, model):
             except:
                 continue
 
-
+    
     print("Opening Image Viewer")
     view = napari.Viewer(show=False)
-    view.add_image(whole_image,name="Original Image")
-    view.add_labels(prediction_mask,name="Predictions")
+    view.add_image(whole_image,name="Image")
+    view.add_labels(prediction_mask,
+                    name="Predictions",
+                    color=["red", "green", "blue", "purple", "cyan", "yellow", "orange"],
+                    opacity=.65)
     view.show(block=True)
     
     print("Writing Image")
-    savePath = Path("Predictions")
+    savePath = Path("predictions")
     savePath.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(savePath / Path("model_image.png")), cv2.cvtColor(whole_image, cv2.COLOR_RGB2BGR))
-    cv2.imwrite(str(savePath / Path("model_predictions.png")), cv2.cvtColor(prediction_overlay, cv2.COLOR_RGB2BGR))
+    cv2.imwrite(str(savePath / Path("model_predictions.png")))
 
 
 def get_opts():

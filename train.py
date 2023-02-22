@@ -251,7 +251,7 @@ def get_opts():
     parser.add_argument('--batchSize', '-b', type=int, default=8, help = "Batch Size. Default = 8")
     parser.add_argument('--learningRate', '-l', type=float, default=.0001, help = "Learning Rate. Default = .0001")
     parser.add_argument('--numEpochs', '-e', type=int, default = 5, help = "Numer of Epochs. Default = 5")
-    parser.add_argument('savePath',type=str, default = str(Path.cwd()), help = "Path To Save Trained Model To. Should be of the form: '$DesiredPath/ModelName")
+    parser.add_argument('--savePath',type=str, help = "The name of the model to be saved")
 
     return parser.parse_args()
 
@@ -277,12 +277,11 @@ def main():
     except Exception as e:
         print("Unable to Train Model: ", e)
     
-    try:
-        myDLV3.save_model(opts.savePath)
-    except:
-        print("Unable to save model to specified path.")
-        print("Saving to current working directory: ", os.getcwd(), "DLV3_Model")
-        myDLV3.save_model(os.getcwd + "DLV3_Model")
+    if opts.savePath is not None:
+        myDLV3.save_model(str(Path.cwd() / Path("models") / Path(opts.savePath)))
+    else:
+        modelName = "ImageSize" + str(opts.imageSize) + "_BatchSize" + str(opts.batchSize) + "_LearningRate" + str(opts.learningRate)
+        myDLV3.save_model(str(Path.cwd() / Path("models") / Path(modelName)))
 
 if __name__=="__main__":
     main()
