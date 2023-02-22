@@ -5,6 +5,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 import argparse
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 import tensorflow as tf
 from tensorflow import keras
 from keras import layers

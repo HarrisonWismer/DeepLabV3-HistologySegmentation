@@ -4,7 +4,9 @@ from pathlib import Path
 import slideio
 import argparse
 import napari
+import os
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 import tensorflow as tf
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -70,6 +72,7 @@ def predict_and_stitch(scene, tile_size, model, viewer = True):
     downX = int((x - origXStart) // downscale)
     downY = int((y - origYStart) // downscale)
 
+    print()
     print("Allocating Image Space")
     whole_image = np.zeros(shape=(downY, downX , 3),dtype='uint8') # RGB Image
     prediction_mask = np.zeros(shape=(downY,downX),dtype='uint8') # Label Image
@@ -140,8 +143,8 @@ def main():
     scaled_image, prediction_overlay = predict_and_stitch(scene, opts.tile_size, model, opts.show_viewer)
 
     print("Writing Images")
-    image_name = opts.image_path.split(".")[0]
-    savePath = Path("predictions"); savePath.mkdir(parents=True, exist_ok=True)
+    image_name = Path(opts.image_path).name.split(".")[0]
+    savePath = Path.cwd() / Path("predictions"); savePath.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(savePath / Path(image_name + "_image.png")), cv2.cvtColor(scaled_image, cv2.COLOR_RGB2BGR))
     cv2.imwrite(str(savePath / Path(image_name + "_predictions.png")), prediction_overlay)
 
