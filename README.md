@@ -1,2 +1,2 @@
-# DeepLabV3-HESegmentation
+# DeepLabV3 - H&E Segmentation
  

@@ -251,21 +251,15 @@ def get_opts():
     parser.add_argument('--batchSize', '-b', type=int, default=8, help = "Batch Size. Default = 8")
     parser.add_argument('--learningRate', '-l', type=float, default=.0001, help = "Learning Rate. Default = .0001")
     parser.add_argument('--numEpochs', '-e', type=int, default = 5, help = "Numer of Epochs. Default = 5")
-    parser.add_argument('trainingPath', type=str, help = "Folder containing Training Images & Masks. This folder should contain one folder called imgs and one folder called masks.")
     parser.add_argument('savePath',type=str, default = str(Path.cwd()), help = "Path To Save Trained Model To. Should be of the form: '$DesiredPath/ModelName")
 
     return parser.parse_args()
 
 def main():
+
     opts = get_opts()
 
-    print(opts.trainingPath)
 
-    # Verify if the path to the training data is valid. This does not check that the two necessary prerequisit folders are present.
-    if not os.path.exists(opts.trainingPath) or not os.path.isdir(opts.trainingPath) or opts.trainingPath is None:
-        print("Invalid Traning Path")
-        exit(1)
-    
     # Create the DLV3Model object to instantiate the untrained model.\
     print("Creating Model")
     myDLV3 = DLV3Model(image_size = opts.imageSize, 
@@ -278,7 +272,8 @@ def main():
     # Train the model with the specified training data and save the model afterward.
     print("Loading Training Data")
     try:
-        myDLV3.train_model(opts.trainingPath)
+        trainingPath = str(Path.cwd() / Path("training_data"))
+        myDLV3.train_model(trainingPath)
     except Exception as e:
         print("Unable to Train Model: ", e)
     
