@@ -93,13 +93,15 @@ def predict_and_stitch(scene, tile_size, model, viewer = True):
                 continue
 
     if viewer == True:
+        colors = {1: "red", 2:"green", 3: "blue", 4:"purple"}
         # Open viewer to see predictions in napari
         print("Opening Image Viewer")
         view = napari.Viewer(show=False)
         view.add_image(whole_image,name="Image")
         view.add_labels(prediction_mask,
                         name="Predictions",
-                        opacity=.65)
+                        opacity=.65,
+                        color=colors)
         view.show(block=True)
 
     return whole_image, prediction_mask
@@ -107,8 +109,8 @@ def predict_and_stitch(scene, tile_size, model, viewer = True):
 
 def get_opts():
     """"
-    Handles the arguments needed to run the program. Note that the only non-optional arguments
-    are the path to the training data and the path to save the model to.
+    Handles the arguments needed to run the program. Note that the only non-optional argument is whether
+    to show the viewer to interactively view predictions.
     """
     parser = argparse.ArgumentParser(description = "Train A DeepLabV3+ Model Using Images & Masks")
     parser.add_argument('model_path', type=str, help = "Path to the trained model from train.py")
@@ -137,7 +139,7 @@ def main():
 
     scaled_image, prediction_overlay = predict_and_stitch(scene, opts.tile_size, model, opts.show_viewer)
 
-    print("Writing Image")
+    print("Writing Images")
     image_name = opts.image_path.split(".")[0]
     savePath = Path("predictions"); savePath.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(savePath / Path(image_name + "_image.png")), cv2.cvtColor(scaled_image, cv2.COLOR_RGB2BGR))
