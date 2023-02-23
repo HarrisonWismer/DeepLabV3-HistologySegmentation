@@ -143,6 +143,8 @@ class DLV3Model():
         print("Validation Loss:", validation_loss)
         print("Validation Accuracy", validation_accuracy)
         print()
+
+        return training_loss, training_accuracy, validation_loss, validation_accuracy
     
     def get_model(self):
         """
@@ -252,7 +254,7 @@ def get_opts():
     parser.add_argument('--batch-size', '-b', type=int, default=8, help = "Batch Size. Default = 8")
     parser.add_argument('--learning-rate', '-l', type=float, default=.0001, help = "Learning Rate. Default = .0001")
     parser.add_argument('--num-epochs', '-e', type=int, default = 5, help = "Numer of Epochs. Default = 5")
-    parser.add_argument('--save-path',type=str, help = "The name of the model to be saved")
+    parser.add_argument('--save-path', '-s', type=str, help = "The name of the model to be saved")
 
     return parser.parse_args()
 
@@ -274,15 +276,29 @@ def main():
     print("Loading Training Data")
     try:
         trainingPath = str(Path.cwd() / Path("training_data"))
-        myDLV3.train_model(trainingPath)
+        training_loss, training_accuracy, validation_loss, validation_accuracy = myDLV3.train_model(trainingPath)
     except Exception as e:
         print("Unable to train model with given training path: ", e)
     
     if opts.save_path is not None:
-        myDLV3.save_model(str(Path.cwd() / Path("models") / Path(opts.save_path)))
+        modelPath = Path.cwd() / Path("models") / Path(opts.save_path)
+        myDLV3.save_model(str(modelPath))
     else:
-        modelName = "ImageSize" + str(opts.image_size) + "_BatchSize" + str(opts.batch_size) + "_LearningRate" + str(opts.learning_rate)
-        myDLV3.save_model(str(Path.cwd() / Path("models") / Path(modelName)))
+        modelName = "trained_model"
+        modelPath = Path.cwd() / Path("models") / Path(modelName)
+        myDLV3.save_model(str(modelPath))
+    
+    with open(modelPath / Path("model_info.txt"), "w") as f:
+        print("image_size:", opts.image_size, file=f)
+        print("num_classes:", opts.num_classes, file=f)
+        print("val_split:", opts.val_split, file=f)
+        print("batch_size:", opts.batch_size, file=f)
+        print("learning_rate:", opts.learning_rate, file=f)
+        print("num_epochs:", opts.num_epochs, file=f)
+        print("training_loss:", training_loss,file=f)
+        print("training_accuracy:", training_accuracy, file=f)
+        print("validation_loss:", validation_loss, file=f)
+        print("validation_accuracy:", validation_accuracy, file=f)
 
 if __name__=="__main__":
     main()
