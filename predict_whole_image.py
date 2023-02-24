@@ -115,7 +115,7 @@ def get_opts():
     Handles the arguments needed to run the program. Note that the only non-optional argument is whether
     to show the viewer to interactively view predictions.
     """
-    parser = argparse.ArgumentParser(description = "Train A DeepLabV3+ Model Using Images & Masks")
+    parser = argparse.ArgumentParser(description = "Create a prediction overlay using a trained DeepLabV3+ Model")
     parser.add_argument('model_path', type=str, help = "Path to the trained model from train.py")
     parser.add_argument('image_path', type=str, help = "Path to folder containing image to tile and predict")
     parser.add_argument('tile_size', type=int, help = "Size of each tile to use as image to predict. Should be the same size as training tiles.")
