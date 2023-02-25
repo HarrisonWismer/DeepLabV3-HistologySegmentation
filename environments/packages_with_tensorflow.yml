@@ -13,6 +13,7 @@ dependencies:
   - opencv=4.7.0
   - numpy
   - pip
+  - pillow
 
   - pip:
     - tensorflow<2.11
