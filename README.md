@@ -80,4 +80,7 @@ Inputs:
 2. prediction_path -> The path to a label-image with prediction values.
 3. num_classes -> The number of classes present.
 4. class_names, -c (Optional) -> The names of the classes present. If not specified, the script will output numerical categories (ie. 1,2,3,...) as class names. The number of class names specified should be equal to (num_classes - 1) since the background "class" does not need to be named.
- 
+
+Outputs:
+1. A global accuracy value.
+2. A "class" accuracy value for each class.
