@@ -14,6 +14,7 @@ gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
 
+CUDA_VISIBLE_DEVICES=""
 
 class DLV3Model():
 
@@ -121,30 +122,54 @@ class DLV3Model():
         Output:
             This function will print the final training and validation losses and accuracies.
         """
-        
-        train_loader = DataLoader(input_path, self.image_size, self.batch_size, self.val_split)
-        train_dataset, val_dataset = train_loader.load_training_data()
-        
-        loss = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-        self.model.compile(
-            optimizer=keras.optimizers.Adam(learning_rate=self.learning_rate),
-            loss=loss,
-            metrics=["accuracy"],)
+        try:
+            train_loader = DataLoader(input_path, self.image_size, self.batch_size, self.val_split)
+            train_dataset, val_dataset = train_loader.load_training_data()
+            
+            loss = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+            self.model.compile(
+                optimizer=keras.optimizers.Adam(learning_rate=self.learning_rate),
+                loss=loss,
+                metrics=["accuracy"],)
 
-        history = self.model.fit(train_dataset, validation_data=val_dataset, epochs=self.num_epochs)
-        
-        training_loss = history.history['loss'][-1]
-        training_accuracy = history.history['accuracy'][-1]
-        validation_loss = history.history['val_loss'][-1]
-        validation_accuracy = history.history['val_accuracy'][-1]
-        print()
-        print("Training Loss:", training_loss)
-        print("Training Accuracy:", training_accuracy)
-        print("Validation Loss:", validation_loss)
-        print("Validation Accuracy", validation_accuracy)
-        print()
+            history = self.model.fit(train_dataset, validation_data=val_dataset, epochs=self.num_epochs)
+        except Exception as e1:
+            print("Unable To Train:", e1)
+            print()
+            print("Attempting To Train Using CPU")
+            print()
 
-        return training_loss, training_accuracy, validation_loss, validation_accuracy
+            try:
+                with tf.device('/CPU:0'):
+                    train_loader = DataLoader(input_path, self.image_size, self.batch_size, self.val_split)
+                    train_dataset, val_dataset = train_loader.load_training_data()
+                    
+                    loss = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+                    self.model.compile(
+                        optimizer=keras.optimizers.Adam(learning_rate=self.learning_rate),
+                        loss=loss,
+                        metrics=["accuracy"],)
+
+                    history = self.model.fit(train_dataset, validation_data=val_dataset, epochs=self.num_epochs)
+            
+            except Exception as e2:
+                print("Unable To Train Using CPU:", e2)
+                print()
+                exit(1)
+
+            
+            training_loss = history.history['loss'][-1]
+            training_accuracy = history.history['accuracy'][-1]
+            validation_loss = history.history['val_loss'][-1]
+            validation_accuracy = history.history['val_accuracy'][-1]
+            print()
+            print("Training Loss:", training_loss)
+            print("Training Accuracy:", training_accuracy)
+            print("Validation Loss:", validation_loss)
+            print("Validation Accuracy", validation_accuracy)
+            print()
+
+            return training_loss, training_accuracy, validation_loss, validation_accuracy
     
     def get_model(self):
         """
@@ -188,14 +213,16 @@ class DataLoader():
         """
         image = tf.io.read_file(image_path)
         if mask:
-            image = tf.image.decode_png(image, channels=1)
+            image = tf.image.decode_png(image, channels=1, dtype=tf.uint8)
             image.set_shape([None, None, 1])
             image = tf.image.resize(images=image, size=[self.image_size, self.image_size])
+            image = tf.cast(image, tf.uint8)
         else:
-            image = tf.image.decode_png(image, channels=3)
+            image = tf.image.decode_png(image, channels=3, dtype=tf.uint8)
             image.set_shape([None, None, 3])
             image = tf.image.resize(images=image, size=[self.image_size, self.image_size])
             image = tf.keras.applications.resnet50.preprocess_input(image)
+            image = tf.cast(image, tf.uint8)
         return image
 
 
