@@ -213,16 +213,14 @@ class DataLoader():
         """
         image = tf.io.read_file(image_path)
         if mask:
-            image = tf.image.decode_png(image, channels=1, dtype=tf.uint8)
+            image = tf.image.decode_png(image, channels=1)
             image.set_shape([None, None, 1])
             image = tf.image.resize(images=image, size=[self.image_size, self.image_size])
-            image = tf.cast(image, tf.uint8)
         else:
-            image = tf.image.decode_png(image, channels=3, dtype=tf.uint8)
+            image = tf.image.decode_png(image, channels=3)
             image.set_shape([None, None, 3])
             image = tf.image.resize(images=image, size=[self.image_size, self.image_size])
             image = tf.keras.applications.resnet50.preprocess_input(image)
-            image = tf.cast(image, tf.uint8)
         return image
 
 
