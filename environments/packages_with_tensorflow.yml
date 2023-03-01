@@ -17,4 +17,4 @@ dependencies:
 
   - pip:
     - tensorflow<2.11
-    - slideio==2.02
+    - slideio==2.0.2

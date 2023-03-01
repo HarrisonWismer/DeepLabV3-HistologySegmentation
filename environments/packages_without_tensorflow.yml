@@ -14,4 +14,4 @@ dependencies:
   - pillow
 
   - pip:
-    - slideio==2.02
+    - slideio==2.0.2
