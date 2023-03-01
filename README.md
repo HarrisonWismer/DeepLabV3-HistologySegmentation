@@ -112,17 +112,31 @@ To develop compartmental segmentation algorithms for the kidney on H&E slides vi
 
 ## Methods:
 1. Generate image pairs consisting of a multiplexed immunofluorescence (mIF) image and H&E image of a single whole-slide biopsy.
+
 2. Create a QuPath project containing all image pairs, reserving an image pair for validation purposes.
+
 3. Using the [Warpy Registration Package](https://imagej.net/plugins/bdv/warpy/warpy) in QuPath and ImageJ, register the mIF image to the H&E image to allow for later annotation transfer.
+
 4. In QuPath, create a set of training annotations for the desired classes. Though dependent on what structures are being annotated, generally about 25 annotations are needed per class. These annotations may be split up across images as long as those images are still within the same project.
+
 5. Train a QuPath Pixel Classifier using the set of manual annotations. Tweak the model parameters as needed to get a visually good result in "Live Prediction" mode. Further validation will be performed later on.
+
 6. Using the holdout\validation image pair set asied in step 2, create a few rectangular annotations and fully annotate all structures inside them. These regions will be used as validation ground-truth annotations.
+
 7. Apply the QuPath pixel classifier to the whole validation mIF image.
+
 8. Validate the accuracy / F1 score of the predictions using the annotated validation regions. If the desired quality control metrics are poor, consider retraining.
+
 9. Once satisfied with model performance, apply the QuPath pixel classifier to all other mIF images to generate whole-slide annotations that will be used for training the H&E segmentation classifier.
+
 10. Using the image registration generated from step 3, transfer all of the annotations from the mIF images to their corresponding H&E image.
+
 11. Using a tiling procedure, generate pairs of a raw image and a mask for each tile to be used as training images. Note that the size of the tiles may be image or tissue dependent. Aim to have a large enough tile size to be able to capture entire structures, but small enough to contain just a few structures.
+
 12. Using a semantic segmentation classifier of your choice (in this case, DeepLabV3+ was used), feed the training images into the model. Tweak any parameters (tile size, input size, batch size, learning rate, ...etc.) as needed.
+
 13. Using the trained model, predict on the whole holdout H&E image.
+
 14. Calculate the accuracy \ F1 score (or any other QC metrics) using the same prediction rectangular regions.
+
 15. If satisfied with the model's performance, use the model to predict on future H&E images of the tissue type trained on.
