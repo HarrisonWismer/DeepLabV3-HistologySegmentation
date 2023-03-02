@@ -131,7 +131,7 @@ To develop compartmental segmentation algorithms for the kidney on H&E slides vi
 
 10. Using the image registration generated from step 3, transfer all of the annotations from the mIF images to their corresponding H&E image. Use the transform_objects.groovy script in the qupath_scripts folder to transfer the annotations. 
 
-11. Using a tiling procedure, generate pairs of a raw image and a mask for each tile to be used as training images. Note that the size of the tiles may be image or tissue dependent. Aim to have a large enough tile size to be able to capture entire structures, but small enough to contain just a few structures. Use the export_labeled_tiles.groovy script to export the pairs. Change the tile size and the requsted pixel size used for downscaling as needed.
+11. Using a tiling procedure, generate pairs of a raw image and a mask for each tile to be used as training images. Note that the size of the tiles may be image or tissue dependent. Aim to have a large enough tile size to be able to capture entire structures, but small enough to contain just a few structures. Use the export_labeled_tiles.groovy script in the qupath_scripts folder to export the pairs. Change the tile size and the requsted pixel size used for downscaling as needed.
 
 12. Using a semantic segmentation classifier of your choice (in this case, DeepLabV3+ was used), feed the training images into the model. Tweak any parameters (tile size, input size, batch size, learning rate, ...etc.) as needed.
 
