@@ -1,3 +1,7 @@
+// Exports img,mask pairs by tiling an image.
+
+// Taken from QuPath documentation: https://qupath.readthedocs.io/en/stable/docs/advanced/exporting_annotations.html
+
 import qupath.lib.images.servers.LabeledImageServer
 
 def imageData = getCurrentImageData()

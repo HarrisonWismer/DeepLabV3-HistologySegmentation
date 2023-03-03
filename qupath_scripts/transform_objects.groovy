@@ -1,6 +1,8 @@
 // Transfer PathObjects from another image that contains a serialized RealTransform
 // result from Warpy
 
+// Taken from Warpy documentation https://imagej.net/plugins/bdv/warpy/warpy
+
 // The current Image Entry that we want to transfer PathObjects to
 def targetEntry = getProjectEntry() 
 
