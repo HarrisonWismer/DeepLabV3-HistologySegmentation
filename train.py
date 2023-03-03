@@ -274,11 +274,11 @@ def get_opts():
     """
     parser = argparse.ArgumentParser(description = "Train A DeepLabV3+ Model Using Images & Masks")
     parser.add_argument('--image-size', '-i', type=int, default = 256, help = "n x n Image Size To Downscale Images To. Default = 256")
-    parser.add_argument('--num-classes', '-n', type=int, default = 2, help = "Number of Classes. Default = 2")
+    parser.add_argument('--num-classes', '-n', type=int, default = 4, help = "Number of Classes. Default = 2")
     parser.add_argument('--val-split', '-v', type=float, default = .2, help = "Proportion of Training Data To Be Used For Validation. Default = .2")
     parser.add_argument('--batch-size', '-b', type=int, default=8, help = "Batch Size. Default = 8")
     parser.add_argument('--learning-rate', '-l', type=float, default=.0001, help = "Learning Rate. Default = .0001")
-    parser.add_argument('--num-epochs', '-e', type=int, default = 5, help = "Numer of Epochs. Default = 5")
+    parser.add_argument('--num-epochs', '-e', type=int, default = 3, help = "Numer of Epochs. Default = 5")
     parser.add_argument('--save-path', '-s', type=str, help = "The name of the model to be saved")
 
     return parser.parse_args()
