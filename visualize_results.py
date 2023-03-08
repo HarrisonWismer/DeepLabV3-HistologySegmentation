@@ -44,7 +44,7 @@ def main():
         print(e)
         exit(1)
     
-    view.show()
+    view.show(block=True)
 
 
 if __name__=="__main__":
