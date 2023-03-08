@@ -77,9 +77,10 @@ def predict_and_stitch(scene, tile_size, model, viewer = True):
     whole_image = np.zeros(shape=(downY, downX , 3),dtype='uint8') # RGB Image
     prediction_mask = np.zeros(shape=(downY,downX),dtype='uint8') # Label Image
     
-    print("Tiling and Predicting")
-    for rectY in range(origYStart, y, tile_size):
-        for rectX in range(origXStart, x, tile_size):
+    total_tiles = len(range(origYStart, y, tile_size)) * len(range(origXStart, x, tile_size)) 
+    print("Tiling and Predicting:", total_tiles, "Tiles")
+    for y_tile, rectY in enumerate(range(origYStart, y, tile_size)):
+        for x_tile, rectX in enumerate(range(origXStart, x, tile_size)):
 
             downRectX = int(rectX / downscale)
             downRectY = int(rectY / downscale)
@@ -94,6 +95,7 @@ def predict_and_stitch(scene, tile_size, model, viewer = True):
                 prediction_mask[downRectY:downRectY+input_size, downRectX:downRectX+input_size] = prediction_overlay
             except:
                 continue
+        print(y_tile * x_tile, "Tiles Done")
 
     if viewer == True:
         colors = {1: "red", 2:"green", 3: "blue", 4:"purple"}
