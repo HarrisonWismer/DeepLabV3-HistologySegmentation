@@ -34,7 +34,7 @@ def main():
         exit(1)
     
     try:
-        mask = cv2.imread(opts.image_path, cv2.IMREAD_GRAYSCALE)
+        mask = cv2.imread(opts.overlay_path, cv2.IMREAD_GRAYSCALE)
         view.add_labels(mask,
                         name = "Predictions",
                         color=colors,
