@@ -79,7 +79,7 @@ Inputs:
 1. truth_path -> The path to a label-image with ground truth values.
 2. prediction_path -> The path to a label-image with prediction values.
 3. num_classes -> The number of classes present.
-4. class_names, -c (Optional) -> The names of the classes present. If not specified, the script will output numerical categories (ie. 1,2,3,...) as class names. The number of class names specified should be equal to (num_classes - 1) since the background "class" does not need to be named.
+4. class_names, -c (Optional) -> The names of the classes present. If not specified, the script will output numerical categories (ie. 0,1,2,3,...) as class names.
 
 Output:
 1. A F1 Score for each class
