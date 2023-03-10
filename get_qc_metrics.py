@@ -4,6 +4,7 @@ PIL.Image.MAX_IMAGE_PIXELS = float("inf")
 import numpy as np
 import argparse
 from pathlib import Path
+from sklearn.metrics import f1_score
 
 def getQCMetrics(truth_image_path,prediction_image_path, num_classes):
     """
@@ -27,20 +28,14 @@ def getQCMetrics(truth_image_path,prediction_image_path, num_classes):
         prediction_image = prediction_image.resize(truth_image.size)
     
     # Cast both to np arrays for easily manipulation
-    truth_image = np.asarray(truth_image)
-    prediction_image = np.asarray(prediction_image)
+    truth_image = np.asarray(truth_image).ravel()
+    prediction_image = np.asarray(prediction_image).ravel()
 
-    val_dict = {curr_class : None for curr_class in range(1, num_classes)}
+    f1 = f1_score(truth_image,prediction_image,average=None)
 
-    for curr_class in range(1,num_classes):
-        true_positives = (truth_image == curr_class) & (prediction_image == curr_class) & (truth_image == prediction_image)
-        false_positives = (prediction_image == curr_class) & (truth_image != curr_class)
-        false_negatives = (truth_image == curr_class) & (prediction_image != curr_class)
+    f1_dict = {class_label:f1_score for class_label,f1_score in zip(range(num_classes), f1)}
 
-        f1 = (2 * np.sum(true_positives)) / ((2*np.sum(true_positives)) + np.sum(false_positives) + np.sum(false_negatives))
-        val_dict[curr_class] = f1
-
-    return val_dict
+    return f1_dict
 
 def get_opts():
     """"
@@ -67,6 +62,7 @@ def main():
 
     print()
     val_dict = getQCMetrics(opts.truth_path,opts.prediction_path, opts.num_classes)
+    print(val_dict)
     
     print()
     print("------------------")
