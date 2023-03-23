@@ -17,20 +17,19 @@ was utilized. The purpose of these scripts is to create a simple, streamlined pr
 Found in the "environments" folder within this repository are two conda environment creation .yml files. One of the files installs all the necessary packages but excludes tensorflow, while the other file installs tensorflow in accordance with the instructions for the WINDOWS install. If the environment with tensorflow included does not work, use the other environment file and follow the [Tensorflow installation instructions for your machine here](https://www.tensorflow.org/install).
 
 ## Running Overview
-There are 4 executables total in this repositoty:
+There are 4 executables in total in this repositoty:
 1. train.py -> Used to train a model from scratch.
 2. predict_whole_image.py -> Used to create a prediction mask given a whole slide image.
 3. visualize_results.py -> Used to overlay the prediction mask on the original image in an interactive napari viewer.
 4. get_qc_metrics.py -> Used to get accuracy values for a prediction mask compared to a ground-truth label mask.
 
 ## 1. train.py
-This is likely the first script you will run, as it trains and saves a DeepLabV3+ model to be later used for prediction tasks. To run this script, after cloning this repository make sure to copy all of your training images into the training_data/imgs folder and all of you training
+This is likely the first script you will run, as it trains and saves a DeepLabV3+ model to be later used for prediction tasks. To run this script, after cloning this repository make sure to copy all of your training images into the training_data/imgs folder and all of your training
 masks into the training_data/masks folder. If these folders are empty, the model will not train.
 
 #### Training Data Generation From H&E Images:
 In order to avoid the generally large sizes of H&E images, and to provide the model with enough example images for training, a tiling approach was used to
-create many training tiles to train the model with. This was done in QuPath where whole-slide annotations were present and overlaid over their corresponding regions
-in the original image. A script was used to tile the entire image using a specified tile size. Pairs of tiles consisting of the original image tile and its corresponding mask were saved and placed in the "imgs" and "masks" folders for training. It is a good idea to remember the tile size used during this process, as we will need it later to compute downsampling values during prediction.
+break apart the larger image into smaller chunks to train the model. This was performed in QuPath where whole-slide annotations were present and overlaid over their corresponding regions in the original image. A script was used to tile the entire image using a specified tile size. Pairs of tiles consisting of the original image tile and its corresponding mask were saved and placed in the "imgs" and "masks" folders for training. It is a good idea to remember the tile size used during this process, as we will need it later to compute downsampling values during prediction.
 
 The optional parameters for train.py are:
 * image_size -i -> The input size for each image for the model. For an integer n specified, each image will be scaled to (n x n).
