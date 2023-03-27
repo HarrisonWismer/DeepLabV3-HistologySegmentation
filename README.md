@@ -10,7 +10,7 @@ Code for data loading and model architecture creation were taken and either used
 [Multiclass semantic segmentation using DeepLabV3+](https://keras.io/examples/vision/deeplabv3_plus/)
 
 ## Overview
-The DeepLabV3+ model was utilized as part of a lrager project aiming to predict various structures found in histological staining images. The purpose of these scripts is to create a simple, streamlined process where, as long as they have a set of raw images as well as a set of corresponding label masks, anyone can train a model to perform multi-class semantic segmentation for their own purposes. Though the focus of this project is to be able to predict larger structures within H&E images, the pre-trained weights from ImageNet built into the model architecture would likely lend themselves to other multi-class segmentation tasks.
+The DeepLabV3+ model was utilized as part of a lrager project aiming to predict various structures found in histological staining images. The purpose of these scripts is to create a simple, streamlined process where, as long as they have a set of raw images as well as a set of corresponding label masks, anyone can train a model to perform multi-class semantic segmentation for their own purposes.
 
 ## Prerequisites
 Found in the "environments" folder within this repository are two conda environment creation .yml files. One of the files installs all the necessary packages but excludes tensorflow, while the other file installs tensorflow in accordance with the instructions for the WINDOWS install. If the environment with tensorflow included does not work, use the other environment file and follow the [Tensorflow installation instructions for your machine here](https://www.tensorflow.org/install).
@@ -43,29 +43,28 @@ The optional parameters for train.py are:
 * model_info.txt -> A text file with final loss and accuracy values for both the training data and validation data. Also includes the parameters used to train the model.
 
 ## 2. predict_whole_image.py
-Since the goal of the project these scripts were designed for was to train on H&E data, the predict_whole_image.py script was designed to
-read in a WHOLE SLIDE IMAGE. Giving the model an entire image to predict is not feasible in this case because of the tiling approach used during training.
-To handle this, another tiling approach is used in which the input image for prediction is tiled, each tile is predicted and then stitched back together
-to create the final image and it's corresponding prediction overlay.
+The overarching goal of the project these scripts are designed for is to be able to classify structures present in H&E Images. Thus, the primary application of this script is to predict structures in a WHOLE SLIDE IMAGE. The whole slide image provided will generally be much larger than the tiles used to train the model. Thus, in order to properly annotate the whole image, the input image for this script is tiled with the same tile size as the training tiles. Each individual tile is input into the model and the resulting prediction mask is stitched together.
 
+##### Input:
 The positional (required, in the order specified) arguments for predict_whole_image.py are:
 1. model_path -> The path to the model trained using train.py.
-2. image_path -> The path to the whole-slide image that will be predicted.
+2. image_path -> The path to the whole-slide image that will be used for prediction.
 3. tile_size -> The size of each tile specified when doing the INITIAL TILING (Essentially, the size of the training images). This is not necessarily the same as image_size from train.py.
 4. num_classes -> The number of classes the model will predict (should be the same as when training).
 
 The only optional argument for predict_whole_image.py is:
 1. show_viewer -> A boolean specifying whether or not to open a napari viewer for interactive viewing of the predictions. This viewing can also be done later in visualize_results.py.
 
+##### Output:
 After running the script, the following should be saved to the "predictions" folder in the cloned repository:
-1. A (potentially) downsampled version of the original image.
+1. A (potentially, depending on tile size and input size) downsampled version of the original image.
 2. A prediction mask/overlay containing the predictions for the whole image.
 
 ## 3. visualize_results.py
 Using the output of prediction_whole_image.py, a napari viewer session can be opened where the prediction mask is overlaid upon the original image.
-This viewer is interactive, and the purpose of this script is to be able to zoom in and out to get a sense of how good the predictions are.
+This viewer is interactive, and the purpose of this script is to be able to zoom in and out to visually gain a sense of how well the model is doing.
 
-The only two inputs to this script are:
+##### Input:
 1. image_path -> The path to the saved raw image from predict_whole_image.py.
 2. overlay_path -> The path to the saved prediction mask from predict_whole_image.py.
 
@@ -73,13 +72,13 @@ The only two inputs to this script are:
 ## 4. get_qc_metrics.py
 Using the prediction mask generated by the previously described scripts, the quality control metrics of the predictions can be calculated if a ground-truth mask is supplied.
 
-Inputs:
+##### Input:
 1. truth_path -> The path to a label-image with ground truth values.
 2. prediction_path -> The path to a label-image with prediction values.
 3. num_classes -> The number of classes present.
 4. class_names, -c (Optional) -> The names of the classes present. If not specified, the script will output numerical categories (ie. 0,1,2,3,...) as class names.
 
-Output:
+##### Output:
 1. A F1 Score for each class
 
 # Whole-Slide Multiplexed Immunofluorescence and H&E Segmentation Workflow
