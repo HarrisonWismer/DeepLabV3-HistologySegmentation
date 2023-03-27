@@ -109,13 +109,12 @@ To develop compartmental segmentation algorithms for the kidney on H&E slides vi
     
     
 #### Training Data Generation From H&E Images:
-In order to avoid the generally large sizes of H&E images, and to provide the model with enough example images for training, a tiling approach was used to
-break apart the larger image into smaller chunks to train the model. This was performed in QuPath where whole-slide annotations were present and overlaid over their corresponding regions in the original image. A script was used to tile the entire image using a specified tile size. Pairs of tiles consisting of the original image tile and its corresponding mask were saved and placed in the "imgs" and "masks" folders for training. It is a good idea to remember the tile size used during this process, as we will need it later to compute downsampling values during prediction.
+In order to provide the model with enough example images for training, a tiling approach was used to break apart the larger image into smaller tiles. Using a user-specified tile size, a QuPath script was used to tile the entire image in regions where annotations were present. The script generates tile pairs where one image corresponds to the raw H&E region, and the other is a multi-class label image corresponding to ground-truth annotations. It is a good idea to remember the tile size used during this process, as it may be needed later during the prediction step.
 
-## Methods:
-1. Generate image pairs consisting of a multiplexed immunofluorescence (mIF) image and H&E image of a single whole-slide biopsy.
+## Workflow:
+1. Generate image pairs consisting of a 1) A multiplexed immunofluorescence (mIF) image and 2) An H&E image. The same slide should be used for both modalities to create the pair.
 
-2. Create a QuPath project containing all image pairs, reserving an image pair for validation purposes.
+2. Create a QuPath project containing all image pairs, reserving at least one image pair for validation purposes.
 
 3. Using the [Warpy Registration Package](https://imagej.net/plugins/bdv/warpy/warpy) in QuPath and ImageJ, register the mIF image to the H&E image to allow for later annotation transfer.
 
@@ -123,17 +122,17 @@ break apart the larger image into smaller chunks to train the model. This was pe
 
 5. Train a QuPath Pixel Classifier using the set of manual annotations. Tweak the model parameters as needed to get a visually good result in "Live Prediction" mode. Further validation will be performed later on.
 
-6. Using the holdout\validation image pair set asied in step 2, create a few rectangular annotations and fully annotate all structures inside them. These regions will be used as validation ground-truth annotations.
+6. Using the holdout\validation image pair set aside in step 2, create a few rectangular annotations and fully annotate all structures inside them. These regions will be used as validation ground-truth annotations for QC purposes.
 
 7. Apply the QuPath pixel classifier to the whole validation mIF image.
 
-8. Validate the accuracy / F1 score of the predictions using the annotated validation regions. If the desired quality control metrics are poor, consider retraining.
+8. Validate the accuracy / F1 score of the predictions using the annotated validation regions. If the desired quality control metrics are poor, consider retraining with more annotations.
 
-9. Once satisfied with model performance, apply the QuPath pixel classifier to all other mIF images to generate whole-slide annotations that will be used for training the H&E segmentation classifier.
+9. Once satisfied with model performance, apply the QuPath pixel classifier to all other mIF images to generate whole-slide annotations that will be used for training the H&E segmentation classifier described on this page.
 
 10. Using the image registration generated from step 3, transfer all of the annotations from the mIF images to their corresponding H&E image. Use the transform_objects.groovy script in the qupath_scripts folder to transfer the annotations. 
 
-11. Using a tiling procedure, generate pairs of a raw image and a mask for each tile to be used as training images. Note that the size of the tiles may be image or tissue dependent. Aim to have a large enough tile size to be able to capture entire structures, but small enough to contain just a few structures. Use the export_labeled_tiles.groovy script in the qupath_scripts folder to export the pairs. Change the tile size and the requsted pixel size used for downscaling as needed.
+11. Using a tiling procedure, generate image pairs each consisting of a raw image and mask for each tile to be used as training images. Note that the size of the tiles may be image or tissue dependent. Aim to have a large enough tile size to be able to capture entire structures, but small enough to contain one or just a few structures. Use the export_labeled_tiles.groovy script in the qupath_scripts folder to export the pairs. Change the tile size and the requested pixel size used for downscaling as needed.
 
 12. Using a semantic segmentation classifier of your choice (in this case, DeepLabV3+ was used), feed the training images into the model. Tweak any parameters (tile size, input size, batch size, learning rate, ...etc.) as needed.
 
@@ -142,3 +141,5 @@ break apart the larger image into smaller chunks to train the model. This was pe
 14. Calculate the accuracy \ F1 score (or any other QC metrics) using the same prediction rectangular regions.
 
 15. If satisfied with the model's performance, use the model to predict on future H&E images of the tissue type trained on.
+
+16. (Optional) Continue training the model with any available images. For example, the model may struggle with tissue where disease is present, and thus may need specific training for this task.
