@@ -62,7 +62,6 @@ def main():
 
     print()
     val_dict = getQCMetrics(opts.truth_path,opts.prediction_path, opts.num_classes)
-    print(val_dict)
     
     print()
     print("------------------")
