@@ -10,7 +10,7 @@ Code for data loading and model architecture creation were taken and either used
 [Multiclass semantic segmentation using DeepLabV3+](https://keras.io/examples/vision/deeplabv3_plus/)
 
 ## Overview
-The DeepLabV3+ model was utilized as part of a lrager project aiming to predict various structures found in histological staining images. The purpose of these scripts is to create a simple, streamlined process where, as long as they have a set of raw images as well as a set of corresponding label masks, anyone can train a model to perform multi-class semantic segmentation for their own purposes.
+The DeepLabV3+ model was utilized as part of a larger project aiming to predict various structures found in histological staining images. The purpose of these scripts is to create a simple, streamlined process where, as long as they have a set of raw images as well as a set of corresponding label masks, anyone can train a model to perform multi-class semantic segmentation for their own purposes.
 
 ## Prerequisites
 Found in the "environments" folder within this repository are two conda environment creation .yml files. One of the files installs all the necessary packages but excludes tensorflow, while the other file installs tensorflow in accordance with the instructions for the WINDOWS install. If the environment with tensorflow included does not work, use the other environment file and follow the [Tensorflow installation instructions for your machine here](https://www.tensorflow.org/install).
